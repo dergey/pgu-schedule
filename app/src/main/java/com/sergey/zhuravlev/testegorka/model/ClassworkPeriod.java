@@ -1,0 +1,22 @@
+package com.sergey.zhuravlev.testegorka.model;
+
+public enum ClassworkPeriod {
+
+    FIRST_CLASSWORK ("8.30-10.00"),
+    SECOND_CLASSWORK ("10.15-11.45"),
+    THIRD_CLASSWORK ("12.15-13.45"),
+    FOURTH_CLASSWORK ("14.15-15.45"),
+    FIFTH_CLASSWORK ("16.00-17.30"),
+    SIXTH_CLASSWORK ("17.45-19.15"),
+    SEVENTH_CLASSWORK ("19.25-20.50");
+
+    private String period;
+
+    ClassworkPeriod(final String title) {
+        this.period = title;
+    }
+
+    public String getPeriod() {
+        return period;
+    }
+}
