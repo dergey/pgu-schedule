@@ -1,11 +1,11 @@
-package com.sergey.zhuravlev.testegorka.parser;
+package com.sergey.zhuravlev.pgu.schedule.parser;
 
 import android.util.Log;
 
-import com.sergey.zhuravlev.testegorka.exception.ParseScheduleException;
-import com.sergey.zhuravlev.testegorka.model.ClassworkPeriod;
-import com.sergey.zhuravlev.testegorka.model.DayOfWeek;
-import com.sergey.zhuravlev.testegorka.model.Schedule;
+import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
+import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
+import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
+import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
