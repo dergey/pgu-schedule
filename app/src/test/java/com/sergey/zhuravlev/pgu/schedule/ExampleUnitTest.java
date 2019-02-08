@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka;
+package com.sergey.zhuravlev.pgu.schedule;
 
 import org.junit.Test;
 

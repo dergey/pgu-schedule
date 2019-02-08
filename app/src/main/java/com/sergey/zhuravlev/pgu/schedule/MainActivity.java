@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka;
+package com.sergey.zhuravlev.pgu.schedule;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -18,10 +18,10 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sergey.zhuravlev.testegorka.exception.ParseScheduleException;
-import com.sergey.zhuravlev.testegorka.model.Schedule;
-import com.sergey.zhuravlev.testegorka.parser.ScheduleParser;
-import com.sergey.zhuravlev.testegorka.preprocessor.WordProcessor;
+import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
+import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
+import com.sergey.zhuravlev.pgu.schedule.parser.ScheduleParser;
+import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordProcessor;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka.model;
+package com.sergey.zhuravlev.pgu.schedule.model;
 
 public enum DayOfWeek {
 
