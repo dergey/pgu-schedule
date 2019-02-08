@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka;
+package com.sergey.zhuravlev.pgu.schedule;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.sergey.zhuravlev.testegorka", appContext.getPackageName());
+        assertEquals("com.sergey.zhuravlev.pgu.schedule", appContext.getPackageName());
     }
 }

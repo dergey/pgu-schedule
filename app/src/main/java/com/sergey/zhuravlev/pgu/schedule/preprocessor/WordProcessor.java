@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka.preprocessor;
+package com.sergey.zhuravlev.pgu.schedule.preprocessor;
 
 import android.graphics.Color;
 import android.os.Build;

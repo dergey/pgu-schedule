@@ -1,4 +1,4 @@
-package com.sergey.zhuravlev.testegorka.exception;
+package com.sergey.zhuravlev.pgu.schedule.exception;
 
 public class ParseScheduleException extends Exception {
 
