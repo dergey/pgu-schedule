@@ -4,10 +4,10 @@ public class Classwork {
 
     private final DayOfWeek dayOfWeek;
     private final ClassworkPeriod period;
-    private final String group;
+    private final Group group;
     private final String classwork;
 
-    public Classwork(DayOfWeek dayOfWeek, ClassworkPeriod period, String group, String classwork) {
+    public Classwork(DayOfWeek dayOfWeek, ClassworkPeriod period, Group group, String classwork) {
         this.dayOfWeek = dayOfWeek;
         this.period = period;
         this.group = group;
@@ -22,7 +22,7 @@ public class Classwork {
         return period;
     }
 
-    public String getGroup() {
+    public Group getGroup() {
         return group;
     }
 

@@ -15,7 +15,7 @@ public class Schedule {
         this.rawSchedule = new ArrayList<>();
     }
 
-    public void addClasswork(DayOfWeek dayOfWeek, ClassworkPeriod period, String classwork, String group) {
+    public void addClasswork(DayOfWeek dayOfWeek, ClassworkPeriod period, String classwork, Group group) {
         rawSchedule.add(new Classwork(dayOfWeek, period, group, classwork));
     }
 

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
 import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
 import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
+import com.sergey.zhuravlev.pgu.schedule.model.Group;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 
 import org.apache.poi.xwpf.usermodel.XWPFTable;
@@ -16,22 +17,24 @@ public class ScheduleParser {
     public static Schedule parse(XWPFTable rawTable) throws ParseScheduleException {
         Schedule schedule = new Schedule();
         DayOfWeek dayOfWeek = null;
+        Group group = null;
 
         for (XWPFTableRow xwpfTableRow : rawTable.getRows()) {
             ClassworkPeriod classworkPeriod = null;
-            int i = 0;
-
             for (XWPFTableCell xwpfTableCell : xwpfTableRow.getTableCells()) {
                 Log.d("Test", "TcPrChange = " + xwpfTableCell.getCTTc().getTcPr().isSetTcPrChange());
                 Log.d("Test", "CELL " + xwpfTableCell.getText());
-                if (isDayOfWeek(xwpfTableCell.getText())) {
+                if (isGroup(xwpfTableCell.getText())) {
+                    group = getGroup(xwpfTableCell.getText());
+                    Log.d("Test", "\tGROUP " + dayOfWeek);
+                } else if (isDayOfWeek(xwpfTableCell.getText())) {
                     dayOfWeek = getDayOfWeek(xwpfTableCell.getText());
                     Log.d("Test", "\tDAY_OF_WEEK " + dayOfWeek);
                 } else if (isClassworkPeriod(xwpfTableCell.getText())) {
                     classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
                     Log.d("Test", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null) {
-                    schedule.addClasswork(dayOfWeek, classworkPeriod, xwpfTableCell.getText(), "Группа " + ++i);
+                    schedule.addClasswork(dayOfWeek, classworkPeriod, xwpfTableCell.getText(), group);
                     Log.d("Test", "\tCLASSWORK " + xwpfTableCell.getText());
                 }
             }
@@ -103,6 +106,54 @@ public class ScheduleParser {
                 return ClassworkPeriod.SEVENTH_CLASSWORK;
             default:
                 throw new ParseScheduleException("ClassworkPeriod not parsable");
+        }
+
+    }
+
+    private static boolean isGroup(String text) {
+        try {
+            getGroup(text);
+        } catch (ParseScheduleException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private static Group getGroup(String text) throws ParseScheduleException {
+        text = text.toLowerCase();
+        String acceptedYearChars = "1234567890";
+        String acceptedNameChars = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        StringBuilder yearStringBuilder = new StringBuilder();
+        char[] chars = text.toCharArray();
+        for (char aChar : chars) {
+            if (acceptedYearChars.indexOf(aChar) == -1) continue;
+            yearStringBuilder.append(aChar);
+        }
+
+        int year;
+
+        try {
+            String yearString = yearStringBuilder.toString();
+            year = Integer.valueOf(yearString);
+        } catch (NumberFormatException error) {
+            throw new ParseScheduleException("Group year not parsable");
+        }
+
+        StringBuilder nameStringBuilder = new StringBuilder();
+        chars = text.toCharArray();
+        for (char aChar : chars) {
+            if (acceptedNameChars.indexOf(aChar) == -1) continue;
+            nameStringBuilder.append(aChar);
+        }
+
+        String name = nameStringBuilder.toString();
+
+        if (name.startsWith("арх")) {
+            return new Group("архитектура", year);
+        } else if (name.startsWith("гео")) {
+            return new Group("геодезия", year);
+        } else {
+            throw new ParseScheduleException("Group not parsable");
         }
 
     }
