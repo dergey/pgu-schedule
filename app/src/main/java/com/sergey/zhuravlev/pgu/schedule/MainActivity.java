@@ -14,11 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 import com.sergey.zhuravlev.pgu.schedule.parser.ScheduleParser;
 import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordProcessor;
@@ -75,20 +73,12 @@ public class MainActivity extends AppCompatActivity
                 Uri selectedFile = data.getData();
                 if (selectedFile == null) throw new NullPointerException();
                 WordProcessor processor = new WordProcessor();
-                Schedule schedule = new Schedule();
-                int i = 0;
-                while (schedule.getRawSchedule().size() == 0) {
-                    schedule = ScheduleParser.parse(processor.loadDocument(resolver.openInputStream(selectedFile), i));
-                    i++;
-                }
+                Schedule schedule = ScheduleParser.parse(processor.loadDocument(resolver.openInputStream(selectedFile)));
                 this.schedule.setText(schedule.toString());
                 Toast.makeText(this, "OK", Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 Toast.makeText(this, "ERROR" + e.getMessage(), Toast.LENGTH_LONG).show();
-            } catch (ParseScheduleException e) {
-                Toast.makeText(this, "ERROR WHEN PARSE", Toast.LENGTH_LONG).show();
             }
-
         }
     }
 
@@ -133,7 +123,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

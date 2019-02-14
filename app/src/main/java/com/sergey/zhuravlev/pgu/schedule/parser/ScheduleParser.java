@@ -7,14 +7,33 @@ import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
 import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
 import com.sergey.zhuravlev.pgu.schedule.model.Group;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
+import com.sergey.zhuravlev.pgu.schedule.utils.Utils;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 public class ScheduleParser {
 
-    public static Schedule parse(XWPFTable rawTable) throws ParseScheduleException {
+    private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    private static final String numbers = "1234567890";
+
+    public static Schedule parse(XWPFDocument document) {
+        Schedule schedule = null;
+        for (XWPFTable table : document.getTables()) {
+            try {
+                schedule = parseTable(table);
+            } catch (ParseScheduleException e) {
+                continue;
+            }
+            if (schedule.getRawSchedule().size() > 0)
+                break;
+        }
+        return schedule;
+    }
+
+    private static Schedule parseTable(XWPFTable rawTable) throws ParseScheduleException {
         Schedule schedule = new Schedule();
         DayOfWeek dayOfWeek = null;
         Group group = null;
@@ -52,18 +71,18 @@ public class ScheduleParser {
     }
 
     private static DayOfWeek getDayOfWeek(String text) throws ParseScheduleException {
-        switch (text) {
-            case "Понедельник":
+        switch (Utils.filterString(text, russianAlphabet)) {
+            case "понедельник":
                 return DayOfWeek.MONDAY;
-            case "Вторник":
+            case "вторник":
                 return DayOfWeek.TUESDAY;
-            case "Среда":
+            case "среда":
                 return DayOfWeek.WEDNESDAY;
-            case "Четверг":
+            case "четверг":
                 return DayOfWeek.THURSDAY;
-            case "Пятница":
+            case "пятница":
                 return DayOfWeek.FRIDAY;
-            case "Суббота":
+            case "суббота":
                 return DayOfWeek.SATURDAY;
             default:
                 throw new ParseScheduleException("DayOfWeek not parsable");
@@ -80,16 +99,7 @@ public class ScheduleParser {
     }
 
     private static ClassworkPeriod getClassworkPeriod(String text) throws ParseScheduleException {
-        String acceptedChars = "1234567890";
-        StringBuilder validStringBuilder = new StringBuilder();
-        char[] chars = text.toCharArray();
-        for (char aChar : chars) {
-            if (acceptedChars.indexOf(aChar) == -1) continue;
-            validStringBuilder.append(aChar);
-        }
-        String validString = validStringBuilder.toString();
-
-        switch (validString) {
+        switch (Utils.filterString(text, numbers)) {
             case "8301000":
                 return ClassworkPeriod.FIRST_CLASSWORK;
             case "10151145":
@@ -120,33 +130,16 @@ public class ScheduleParser {
     }
 
     private static Group getGroup(String text) throws ParseScheduleException {
-        text = text.toLowerCase();
-        String acceptedYearChars = "1234567890";
-        String acceptedNameChars = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
-        StringBuilder yearStringBuilder = new StringBuilder();
-        char[] chars = text.toCharArray();
-        for (char aChar : chars) {
-            if (acceptedYearChars.indexOf(aChar) == -1) continue;
-            yearStringBuilder.append(aChar);
-        }
-
         int year;
 
         try {
-            String yearString = yearStringBuilder.toString();
+            String yearString = Utils.filterString(text, numbers);
             year = Integer.valueOf(yearString);
         } catch (NumberFormatException error) {
             throw new ParseScheduleException("Group year not parsable");
         }
 
-        StringBuilder nameStringBuilder = new StringBuilder();
-        chars = text.toCharArray();
-        for (char aChar : chars) {
-            if (acceptedNameChars.indexOf(aChar) == -1) continue;
-            nameStringBuilder.append(aChar);
-        }
-
-        String name = nameStringBuilder.toString();
+        String name = Utils.filterString(text, russianAlphabet);
 
         if (name.startsWith("арх")) {
             return new Group("архитектура", year);
