@@ -3,30 +3,44 @@ package com.sergey.zhuravlev.pgu.schedule.model;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class Schedule {
 
-    private Collection<Classwork> rawSchedule;
+    private final Date updateTime;
+    private final Collection<Classwork> data;
 
-    public Schedule() {
-        this.rawSchedule = new ArrayList<>();
+    public Schedule(Collection<Classwork> rawSchedule, Date updateTime) {
+        this.data = rawSchedule;
+        this.updateTime = updateTime;
     }
 
-    public void addClasswork(DayOfWeek dayOfWeek, ClassworkPeriod period, String classwork, Group group) {
-        rawSchedule.add(new Classwork(dayOfWeek, period, group, classwork));
+    public Schedule(Collection<Classwork> rawSchedule) {
+        this(rawSchedule, new Date());
     }
 
-    public Collection<Classwork> getRawSchedule() {
-        return rawSchedule;
+    public List<Classwork> getClasswork(DayOfWeek dayOnWeek, Group group) {
+        List<Classwork> classworks = new ArrayList<>();
+        for (Classwork classwork : data) {
+            if (dayOnWeek.equals(classwork.getDayOfWeek())
+                    && classwork.getGroup().equals(group)) {
+                classworks.add(classwork);
+            }
+        }
+        return classworks;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public String toString() {
-        return rawSchedule.stream().map(Classwork::toString).reduce("", (c1, c2) -> c1 + '\n' + c2);
+        return data.stream().map(Classwork::toString).reduce("", (c1, c2) -> c1 + '\n' + c2);
     }
 
 }
