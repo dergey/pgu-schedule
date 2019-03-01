@@ -7,29 +7,28 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sergey.zhuravlev.pgu.schedule.adapter.ScheduleAdapter;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 import com.sergey.zhuravlev.pgu.schedule.parser.ScheduleParser;
 import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordProcessor;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int DOC_SELECT_CODE = 1;
 
-    private TextView schedule;
-    private Button button;
+    private ScheduleAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +42,11 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        button = findViewById(R.id.make_choise);
-        schedule = findViewById(R.id.schedule);
-
-        button.setOnClickListener(event-> {
-            Intent intent = new Intent().setType("application/vnd.openxmlformats-officedocument.wordprocessingml.document").setAction(Intent.ACTION_GET_CONTENT);
-            this.startActivityForResult(Intent.createChooser(intent, "Select a doc"), DOC_SELECT_CODE);
-        });
-
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        adapter = new ScheduleAdapter(this, getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -74,7 +70,7 @@ public class MainActivity extends AppCompatActivity
                 if (selectedFile == null) throw new NullPointerException();
                 WordProcessor processor = new WordProcessor();
                 Schedule schedule = ScheduleParser.parse(processor.loadDocument(resolver.openInputStream(selectedFile)));
-                this.schedule.setText(schedule.toString());
+                adapter.setSchedule(schedule);
                 Toast.makeText(this, "OK", Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 Toast.makeText(this, "ERROR" + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -97,6 +93,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_open) {
+            Intent intent = new Intent().setType("application/vnd.openxmlformats-officedocument.wordprocessingml.document").setAction(Intent.ACTION_GET_CONTENT);
+            this.startActivityForResult(Intent.createChooser(intent, "Select a doc"), DOC_SELECT_CODE);
             return true;
         }
 

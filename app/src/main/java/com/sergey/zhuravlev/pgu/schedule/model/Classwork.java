@@ -6,12 +6,14 @@ public class Classwork {
     private final ClassworkPeriod period;
     private final Group group;
     private final String classwork;
+    private final String audience;
 
-    public Classwork(DayOfWeek dayOfWeek, ClassworkPeriod period, Group group, String classwork) {
+    public Classwork(DayOfWeek dayOfWeek, ClassworkPeriod period, Group group, String classwork, String audience) {
         this.dayOfWeek = dayOfWeek;
         this.period = period;
         this.group = group;
         this.classwork = classwork;
+        this.audience = audience;
     }
 
     public DayOfWeek getDayOfWeek() {
@@ -30,13 +32,8 @@ public class Classwork {
         return classwork;
     }
 
-    @Override
-    public String toString() {
-        return "Classwork{" +
-                "dayOfWeek=" + dayOfWeek +
-                ", period=" + period.getPeriod() +
-                ", group='" + group + '\'' +
-                ", classwork='" + classwork + '\'' +
-                '}';
+    public String getAudience() {
+        return audience;
     }
+
 }
