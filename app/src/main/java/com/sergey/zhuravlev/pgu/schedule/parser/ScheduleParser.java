@@ -34,7 +34,8 @@ public class ScheduleParser {
             if (rawSchedule.size() > 0)
                 break;
         }
-        if (rawSchedule == null) throw new ParseScheduleException("Can't found target schedule in doc");
+        if (rawSchedule == null)
+            throw new ParseScheduleException("Can't found target schedule in doc");
         return new Schedule(rawSchedule);
     }
 
@@ -57,13 +58,24 @@ public class ScheduleParser {
                 } else if (isClassworkPeriod(xwpfTableCell.getText())) {
                     classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
                     Log.d("Parser", "\tPERIOD " + classworkPeriod);
-                } else if (dayOfWeek != null && classworkPeriod != null) {
+                } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
                     rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), null));
                     Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                 }
             }
         }
         return rawSchedule;
+    }
+
+    private static boolean haveText(String text) {
+        if (text.isEmpty()) return false;
+
+        boolean haveText = false;
+        for (char c : text.toCharArray()) {
+            if (c != ' ')
+                haveText = true;
+        }
+        return haveText;
     }
 
     private static boolean isDayOfWeek(String text) {
