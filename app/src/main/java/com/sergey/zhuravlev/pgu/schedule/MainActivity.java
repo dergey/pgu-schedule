@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -18,13 +17,14 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.sergey.zhuravlev.pgu.schedule.adapter.ScheduleAdapter;
+import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 import com.sergey.zhuravlev.pgu.schedule.parser.ScheduleParser;
-import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordProcessor;
+import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordLoader;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final int DOC_SELECT_CODE = 1;
 
@@ -68,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ContentResolver resolver = this.getContentResolver();
                 Uri selectedFile = data.getData();
                 if (selectedFile == null) throw new NullPointerException();
-                WordProcessor processor = new WordProcessor();
-                Schedule schedule = ScheduleParser.parse(processor.loadDocument(resolver.openInputStream(selectedFile)));
+                WordLoader loader = new WordLoader();
+                Schedule schedule = ScheduleParser.parse(loader.loadDocument(resolver.openInputStream(selectedFile)));
                 adapter.setSchedule(schedule);
                 Toast.makeText(this, "OK", Toast.LENGTH_LONG).show();
             } catch (IOException e) {
-                Toast.makeText(this, "ERROR" + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "ERROR WHEN OPEN " + e.getMessage(), Toast.LENGTH_LONG).show();
+            } catch (ParseScheduleException e) {
+                Toast.makeText(this, "ERROR WHEN PARSE " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -103,28 +105,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }

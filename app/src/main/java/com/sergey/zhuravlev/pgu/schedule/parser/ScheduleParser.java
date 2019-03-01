@@ -3,6 +3,7 @@ package com.sergey.zhuravlev.pgu.schedule.parser;
 import android.util.Log;
 
 import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
+import com.sergey.zhuravlev.pgu.schedule.model.Classwork;
 import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
 import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
 import com.sergey.zhuravlev.pgu.schedule.model.Group;
@@ -14,62 +15,55 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScheduleParser {
 
     private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String numbers = "1234567890";
 
-    public static Schedule parse(XWPFDocument document) {
-        Schedule schedule = null;
+    public static Schedule parse(XWPFDocument document) throws ParseScheduleException {
+        List<Classwork> rawSchedule = null;
         for (XWPFTable table : document.getTables()) {
             try {
-                schedule = parseTable(table);
+                rawSchedule = parseTable(table);
             } catch (ParseScheduleException e) {
                 continue;
             }
-            if (schedule.getClassworks().size() > 0)
+            if (rawSchedule.size() > 0)
                 break;
         }
-        return schedule;
+        if (rawSchedule == null) throw new ParseScheduleException("Can't found target schedule in doc");
+        return new Schedule(rawSchedule);
     }
 
-    private static Schedule parseTable(XWPFTable rawTable) throws ParseScheduleException {
-        Schedule schedule = new Schedule();
+    private static List<Classwork> parseTable(XWPFTable rawTable) throws ParseScheduleException {
+        List<Classwork> rawSchedule = new ArrayList<>();
         DayOfWeek dayOfWeek = null;
         Group group = null;
 
         for (XWPFTableRow xwpfTableRow : rawTable.getRows()) {
             ClassworkPeriod classworkPeriod = null;
             for (XWPFTableCell xwpfTableCell : xwpfTableRow.getTableCells()) {
-                Log.d("Test", "TcPrChange = " + xwpfTableCell.getCTTc().getTcPr().isSetTcPrChange());
-                Log.d("Test", "CELL " + xwpfTableCell.getText());
+                Log.d("Parser", "TcPrChange = " + xwpfTableCell.getCTTc().getTcPr().isSetTcPrChange());
+                Log.d("Parser", "CELL " + xwpfTableCell.getText());
                 if (isGroup(xwpfTableCell.getText())) {
                     group = getGroup(xwpfTableCell.getText());
-                    Log.d("Test", "\tGROUP " + dayOfWeek);
+                    Log.d("Parser", "\tGROUP " + dayOfWeek);
                 } else if (isDayOfWeek(xwpfTableCell.getText())) {
                     dayOfWeek = getDayOfWeek(xwpfTableCell.getText());
-                    Log.d("Test", "\tDAY_OF_WEEK " + dayOfWeek);
+                    Log.d("Parser", "\tDAY_OF_WEEK " + dayOfWeek);
                 } else if (isClassworkPeriod(xwpfTableCell.getText())) {
                     classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
-                    Log.d("Test", "\tPERIOD " + classworkPeriod);
+                    Log.d("Parser", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null) {
-                    schedule.addClasswork(dayOfWeek, classworkPeriod, xwpfTableCell.getText(), group, null);
-                    Log.d("Test", "\tCLASSWORK " + xwpfTableCell.getText());
+                    rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), null));
+                    Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                 }
             }
         }
-        return schedule;
-    }
-
-    private static boolean haveText(String text) {
-        if (text.isEmpty()) return false;
-
-        boolean haveText = false;
-        for (char c : text.toCharArray()) {
-            if (c != ' ')
-                haveText = true;
-        }
-        return haveText;
+        return rawSchedule;
     }
 
     private static boolean isDayOfWeek(String text) {

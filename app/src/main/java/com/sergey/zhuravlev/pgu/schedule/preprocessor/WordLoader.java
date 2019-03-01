@@ -8,7 +8,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class WordProcessor {
+public class WordLoader {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public XWPFDocument loadDocument(InputStream inputStream) throws IOException {
