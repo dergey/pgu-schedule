@@ -26,6 +26,8 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String DOCX_MIME_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
     private static final int DOC_SELECT_CODE = 1;
 
     private ScheduleAdapter adapter;
@@ -88,16 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_open) {
-            Intent intent = new Intent().setType("application/vnd.openxmlformats-officedocument.wordprocessingml.document").setAction(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent().setType(DOCX_MIME_TYPE).setAction(Intent.ACTION_GET_CONTENT);
             this.startActivityForResult(Intent.createChooser(intent, "Select a doc"), DOC_SELECT_CODE);
             return true;
         }
