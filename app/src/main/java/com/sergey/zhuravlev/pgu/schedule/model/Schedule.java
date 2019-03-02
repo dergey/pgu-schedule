@@ -23,17 +23,6 @@ public class Schedule {
         this.updateTime = new Date();
     }
 
-    public Schedule() {
-        this.classworks = new ArrayList<>();
-        this.groups = new ArrayList<>();
-        this.updateTime = new Date();
-    }
-
-    public void addClasswork(DayOfWeek dayOfWeek, ClassworkPeriod period, String classwork, Group group, String audience) {
-        if (!groups.contains(group)) groups.add(group);
-        classworks.add(new Classwork(dayOfWeek, period, group, classwork, audience));
-    }
-
     public List<Group> getGroups() {
         return groups;
     }

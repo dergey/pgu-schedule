@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class ScheduleParser {
 
-    private static final Pattern audience = Pattern.compile("(ауд\\.?)([0-9]{3})");
+    private static final Pattern classwork = Pattern.compile("(^.*)\\s([А-Яа-я]+\\s[А-Я]\\.[А-Я]\\.)\\s+ауд\\.?([0-9]{3}н?)");
 
     private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String numbers = "1234567890";
@@ -63,8 +63,13 @@ public class ScheduleParser {
                     classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
                     Log.d("Parser", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
-                    rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), getAudience(xwpfTableCell.getText())));
-                    Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
+                    Matcher matcher = classwork.matcher(xwpfTableCell.getText());
+                    if (matcher.find()) {
+                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+                    } else {
+                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), null, null));
+                        Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
+                    }
                 }
             }
         }
@@ -172,11 +177,19 @@ public class ScheduleParser {
 
     }
 
-    private static String getAudience(String raw) {
-        Log.d("Parser", "getAudience: "+ raw);
-        Matcher matcher = audience.matcher(raw);
-        if (!matcher.find()) return null;
+    private static String getClassworkTitle(Matcher matcher) {
+        Log.d("Parser", "ClassworkTitle " + matcher.group(0));
+        return matcher.group(1);
+    }
+
+    private static String getTeacher(Matcher matcher) {
+        Log.d("Parser", "Teacher " + matcher.group(0));
         return matcher.group(2);
+    }
+
+    private static String getAudience(Matcher matcher) {
+        Log.d("Parser", "Audience " + matcher.group(0));
+        return matcher.group(3);
     }
 
 }

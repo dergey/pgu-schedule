@@ -25,6 +25,13 @@
             android:textColor="#5e4238"
             android:textSize="18dp" />
 
+        <TextView
+            android:id="@+id/classwork_item_teacher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="teacher" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="20dp"
