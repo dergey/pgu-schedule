@@ -17,8 +17,12 @@ import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ScheduleParser {
+
+    private static final Pattern audience = Pattern.compile("(ауд\\.?)([0-9]{3})");
 
     private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String numbers = "1234567890";
@@ -59,7 +63,7 @@ public class ScheduleParser {
                     classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
                     Log.d("Parser", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
-                    rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), null));
+                    rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), getAudience(xwpfTableCell.getText())));
                     Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                 }
             }
@@ -166,6 +170,13 @@ public class ScheduleParser {
             throw new ParseScheduleException("Group not parsable");
         }
 
+    }
+
+    private static String getAudience(String raw) {
+        Log.d("Parser", "getAudience: "+ raw);
+        Matcher matcher = audience.matcher(raw);
+        if (!matcher.find()) return null;
+        return matcher.group(2);
     }
 
 }
