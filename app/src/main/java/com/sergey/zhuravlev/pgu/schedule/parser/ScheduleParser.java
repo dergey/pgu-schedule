@@ -3,11 +3,13 @@ package com.sergey.zhuravlev.pgu.schedule.parser;
 import android.util.Log;
 
 import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
+import com.sergey.zhuravlev.pgu.schedule.exception.WeekPeriodException;
 import com.sergey.zhuravlev.pgu.schedule.model.Classwork;
 import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
 import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
 import com.sergey.zhuravlev.pgu.schedule.model.Group;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
+import com.sergey.zhuravlev.pgu.schedule.model.WeekPeriod;
 import com.sergey.zhuravlev.pgu.schedule.utils.Utils;
 
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -22,7 +24,7 @@ import java.util.regex.Pattern;
 
 public class ScheduleParser {
 
-    private static final Pattern classwork = Pattern.compile("(^.*)\\s([А-Яа-я]+\\s[А-Я]\\.[А-Я]\\.)\\s+ауд\\.?([0-9]{3}н?)");
+    private static final Pattern classwork = Pattern.compile("^([0-9]+-[0-9]+н\\.?\\s)?(.*)\\s([А-Яа-я]+\\s[А-Я]\\.[А-Я]\\.).?ауд\\.?([0-9]{3}н?)");
 
     private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String numbers = "1234567890";
@@ -64,14 +66,14 @@ public class ScheduleParser {
                     Log.d("Parser", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
                     Matcher matcher = classwork.matcher(xwpfTableCell.getText());
+                    Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                     if (column >= groups.size()) column = groups.size() - 1;
                     if (matcher.find()) {
-                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+                        rawSchedule.add(new Classwork(getWeekPeriod(matcher), dayOfWeek, classworkPeriod, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
                     } else {
-                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, groups.get(column), xwpfTableCell.getText(), null, null));
-                        Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
+                        rawSchedule.add(new Classwork(null, dayOfWeek, classworkPeriod, groups.get(column), xwpfTableCell.getText(), null, null));
                     }
-                    column ++;
+                    column++;
                 }
             }
         }
@@ -179,19 +181,29 @@ public class ScheduleParser {
 
     }
 
-    private static String getClassworkTitle(Matcher matcher) {
-        Log.d("Parser", "ClassworkTitle " + matcher.group(0));
-        return matcher.group(1);
+    private static WeekPeriod getWeekPeriod(Matcher matcher) {
+        try {
+            Log.d("Parser.WeekPeriod", "string " + matcher.group(1));
+            return WeekPeriod.of(matcher.group(1));
+        } catch (WeekPeriodException e) {
+            Log.w("Parser.WeekPeriod", e.getMessage());
+            return null;
+        }
     }
 
-    private static String getTeacher(Matcher matcher) {
-        Log.d("Parser", "Teacher " + matcher.group(0));
+    private static String getClassworkTitle(Matcher matcher) {
+        Log.d("Parser.ClassworkTitle", "string " + matcher.group(2));
         return matcher.group(2);
     }
 
-    private static String getAudience(Matcher matcher) {
-        Log.d("Parser", "Audience " + matcher.group(0));
+    private static String getTeacher(Matcher matcher) {
+        Log.d("Parser.Teacher", "string " + matcher.group(3));
         return matcher.group(3);
+    }
+
+    private static String getAudience(Matcher matcher) {
+        Log.d("Parser.Audience", "string " + matcher.group(4));
+        return matcher.group(4);
     }
 
 }

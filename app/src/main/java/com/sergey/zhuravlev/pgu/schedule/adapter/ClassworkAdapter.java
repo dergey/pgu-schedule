@@ -33,7 +33,7 @@ public class ClassworkAdapter extends RecyclerView.Adapter<ClassworkAdapter.Clas
             title.setText(classwork.getClasswork());
             teacher.setVisibility(classwork.getTeacher() == null ? View.GONE : View.VISIBLE);
             teacher.setText(classwork.getTeacher());
-            dayOfWeek.setText(classwork.getDayOfWeek().getTitle());
+            dayOfWeek.setText(classwork.getDayOfWeek().getTitle() + (classwork.getWeekPeriod() != null ? " (" + classwork.getWeekPeriod() + "н.)" : ""));
             time.setText(classwork.getPeriod().getPeriod());
             audience.setText(classwork.getAudience());
         }
