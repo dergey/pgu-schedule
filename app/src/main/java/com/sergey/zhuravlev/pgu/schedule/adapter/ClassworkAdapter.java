@@ -16,13 +16,14 @@ public class ClassworkAdapter extends RecyclerView.Adapter<ClassworkAdapter.Clas
 
     static class ClassworkHolderView extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView title, time, teacher, audience;
+        private TextView title, time, dayOfWeek, teacher, audience;
 
         ClassworkHolderView(View itemView) {
             super(itemView);
             itemView.getContext();
             itemView.setOnClickListener(this);
             title = itemView.findViewById(R.id.classwork_item_title);
+            dayOfWeek = itemView.findViewById(R.id.classwork_item_day_of_week);
             teacher = itemView.findViewById(R.id.classwork_item_teacher);
             time = itemView.findViewById(R.id.classwork_item_time);
             audience = itemView.findViewById(R.id.classwork_item_audience);
@@ -32,6 +33,7 @@ public class ClassworkAdapter extends RecyclerView.Adapter<ClassworkAdapter.Clas
             title.setText(classwork.getClasswork());
             teacher.setVisibility(classwork.getTeacher() == null ? View.GONE : View.VISIBLE);
             teacher.setText(classwork.getTeacher());
+            dayOfWeek.setText(classwork.getDayOfWeek().getTitle());
             time.setText(classwork.getPeriod().getPeriod());
             audience.setText(classwork.getAudience());
         }

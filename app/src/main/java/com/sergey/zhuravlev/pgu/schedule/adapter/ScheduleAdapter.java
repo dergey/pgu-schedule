@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.sergey.zhuravlev.pgu.schedule.fragment.GroupFragment;
@@ -60,7 +61,7 @@ public class ScheduleAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return String.valueOf(position + 1);
+        return tabs.get(position).getGroup().getName().substring(0, 3) + "-" + tabs.get(position).getGroup().getYear();
     }
 
     @Override

@@ -46,16 +46,16 @@ public class ScheduleParser {
     private static List<Classwork> parseTable(XWPFTable rawTable) throws ParseScheduleException {
         List<Classwork> rawSchedule = new ArrayList<>();
         DayOfWeek dayOfWeek = null;
-        Group group = null;
+        List<Group> groups = new ArrayList<>();
 
         for (XWPFTableRow xwpfTableRow : rawTable.getRows()) {
             ClassworkPeriod classworkPeriod = null;
+            int column = 0;
             for (XWPFTableCell xwpfTableCell : xwpfTableRow.getTableCells()) {
-                Log.d("Parser", "TcPrChange = " + xwpfTableCell.getCTTc().getTcPr().isSetTcPrChange());
                 Log.d("Parser", "CELL " + xwpfTableCell.getText());
                 if (isGroup(xwpfTableCell.getText())) {
-                    group = getGroup(xwpfTableCell.getText());
-                    Log.d("Parser", "\tGROUP " + dayOfWeek);
+                    groups.add(getGroup(xwpfTableCell.getText()));
+                    Log.d("Parser", "\tGROUP " + groups.size());
                 } else if (isDayOfWeek(xwpfTableCell.getText())) {
                     dayOfWeek = getDayOfWeek(xwpfTableCell.getText());
                     Log.d("Parser", "\tDAY_OF_WEEK " + dayOfWeek);
@@ -64,12 +64,14 @@ public class ScheduleParser {
                     Log.d("Parser", "\tPERIOD " + classworkPeriod);
                 } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
                     Matcher matcher = classwork.matcher(xwpfTableCell.getText());
+                    if (column >= groups.size()) column = groups.size() - 1;
                     if (matcher.find()) {
-                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
                     } else {
-                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, group, xwpfTableCell.getText(), null, null));
+                        rawSchedule.add(new Classwork(dayOfWeek, classworkPeriod, groups.get(column), xwpfTableCell.getText(), null, null));
                         Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                     }
+                    column ++;
                 }
             }
         }
@@ -167,9 +169,9 @@ public class ScheduleParser {
 
         String name = Utils.filterString(text, russianAlphabet);
 
-        if (name.startsWith("арх")) {
+        if (name.equals("арх")) {
             return new Group("архитектура", year);
-        } else if (name.startsWith("гео")) {
+        } else if (name.equals("гео")) {
             return new Group("геодезия", year);
         } else {
             throw new ParseScheduleException("Group not parsable");

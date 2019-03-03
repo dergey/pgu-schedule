@@ -2,6 +2,7 @@ package com.sergey.zhuravlev.pgu.schedule.model;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
