@@ -4,28 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    tools:showIn="@layout/app_bar_main"
-    android:orientation="vertical">
+    tools:showIn="@layout/app_bar_main">
 
-    <Button
-        android:id="@+id/make_choise"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:text="Open schedule" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<Button-->
+        <!--android:id="@+id/make_choise"-->
+        <!--android:layout_width="180dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Open schedule" />-->
 
-        <TextView
-            android:id="@+id/schedule"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
-    </ScrollView>
+        <!--<TextView-->
+            <!--android:id="@+id/schedule"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content" />-->
 
+    <!--</ScrollView>-->
 
 
 </LinearLayout>

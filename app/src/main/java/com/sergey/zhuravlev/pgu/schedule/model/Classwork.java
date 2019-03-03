@@ -2,16 +2,26 @@ package com.sergey.zhuravlev.pgu.schedule.model;
 
 public class Classwork {
 
+    private final WeekPeriod weekPeriod;
     private final DayOfWeek dayOfWeek;
     private final ClassworkPeriod period;
-    private final String group;
+    private final Group group;
     private final String classwork;
+    private final String teacher;
+    private final String audience;
 
-    public Classwork(DayOfWeek dayOfWeek, ClassworkPeriod period, String group, String classwork) {
+    public Classwork(WeekPeriod weekPeriod, DayOfWeek dayOfWeek, ClassworkPeriod period, Group group, String classwork, String teacher, String audience) {
+        this.weekPeriod = weekPeriod;
         this.dayOfWeek = dayOfWeek;
         this.period = period;
         this.group = group;
         this.classwork = classwork;
+        this.teacher = teacher;
+        this.audience = audience;
+    }
+
+    public WeekPeriod getWeekPeriod() {
+        return weekPeriod;
     }
 
     public DayOfWeek getDayOfWeek() {
@@ -22,7 +32,7 @@ public class Classwork {
         return period;
     }
 
-    public String getGroup() {
+    public Group getGroup() {
         return group;
     }
 
@@ -30,13 +40,12 @@ public class Classwork {
         return classwork;
     }
 
-    @Override
-    public String toString() {
-        return "Classwork{" +
-                "dayOfWeek=" + dayOfWeek +
-                ", period=" + period.getPeriod() +
-                ", group='" + group + '\'' +
-                ", classwork='" + classwork + '\'' +
-                '}';
+    public String getTeacher() {
+        return teacher;
     }
+
+    public String getAudience() {
+        return audience;
+    }
+
 }
