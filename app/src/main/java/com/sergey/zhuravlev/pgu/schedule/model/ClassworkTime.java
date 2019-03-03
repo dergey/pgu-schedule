@@ -1,6 +1,6 @@
 package com.sergey.zhuravlev.pgu.schedule.model;
 
-public enum ClassworkPeriod {
+public enum ClassworkTime {
 
     FIRST_CLASSWORK ("8.30-10.00"),
     SECOND_CLASSWORK ("10.15-11.45"),
@@ -10,13 +10,13 @@ public enum ClassworkPeriod {
     SIXTH_CLASSWORK ("17.45-19.15"),
     SEVENTH_CLASSWORK ("19.25-20.50");
 
-    private String period;
+    private String string;
 
-    ClassworkPeriod(final String title) {
-        this.period = title;
+    ClassworkTime(final String string) {
+        this.string = string;
     }
 
-    public String getPeriod() {
-        return period;
+    public String getString() {
+        return string;
     }
 }

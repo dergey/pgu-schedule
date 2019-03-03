@@ -5,10 +5,11 @@ import android.util.Log;
 import com.sergey.zhuravlev.pgu.schedule.exception.ParseScheduleException;
 import com.sergey.zhuravlev.pgu.schedule.exception.WeekPeriodException;
 import com.sergey.zhuravlev.pgu.schedule.model.Classwork;
-import com.sergey.zhuravlev.pgu.schedule.model.ClassworkPeriod;
+import com.sergey.zhuravlev.pgu.schedule.model.ClassworkTime;
 import com.sergey.zhuravlev.pgu.schedule.model.DayOfWeek;
 import com.sergey.zhuravlev.pgu.schedule.model.Group;
 import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
+import com.sergey.zhuravlev.pgu.schedule.model.WeekColor;
 import com.sergey.zhuravlev.pgu.schedule.model.WeekPeriod;
 import com.sergey.zhuravlev.pgu.schedule.utils.Utils;
 
@@ -51,7 +52,7 @@ public class ScheduleParser {
         List<Group> groups = new ArrayList<>();
 
         for (XWPFTableRow xwpfTableRow : rawTable.getRows()) {
-            ClassworkPeriod classworkPeriod = null;
+            ClassworkTime classworkTime = null;
             int column = 0;
             for (XWPFTableCell xwpfTableCell : xwpfTableRow.getTableCells()) {
                 Log.d("Parser", "CELL " + xwpfTableCell.getText());
@@ -62,22 +63,27 @@ public class ScheduleParser {
                     dayOfWeek = getDayOfWeek(xwpfTableCell.getText());
                     Log.d("Parser", "\tDAY_OF_WEEK " + dayOfWeek);
                 } else if (isClassworkPeriod(xwpfTableCell.getText())) {
-                    classworkPeriod = getClassworkPeriod(xwpfTableCell.getText());
-                    Log.d("Parser", "\tPERIOD " + classworkPeriod);
-                } else if (dayOfWeek != null && classworkPeriod != null && haveText(xwpfTableCell.getText())) {
+                    classworkTime = getClassworkPeriod(xwpfTableCell.getText());
+                    Log.d("Parser", "\tPERIOD " + classworkTime);
+                } else if (dayOfWeek != null && classworkTime != null && haveText(xwpfTableCell.getText())) {
                     Matcher matcher = classwork.matcher(xwpfTableCell.getText());
                     Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                     if (column >= groups.size()) column = groups.size() - 1;
                     if (matcher.find()) {
-                        rawSchedule.add(new Classwork(getWeekPeriod(matcher), dayOfWeek, classworkPeriod, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+                        rawSchedule.add(new Classwork(getWeekPeriod(matcher), getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
                     } else {
-                        rawSchedule.add(new Classwork(null, dayOfWeek, classworkPeriod, groups.get(column), xwpfTableCell.getText(), null, null));
+                        rawSchedule.add(new Classwork(null, WeekColor.WHILE, dayOfWeek, classworkTime, groups.get(column), xwpfTableCell.getText(), null, null));
                     }
                     column++;
                 }
             }
         }
         return rawSchedule;
+    }
+
+    private static WeekColor getWeekColor(XWPFTableCell xwpfTableCell) {
+        Log.d("Parser.WeekColor", "color " + xwpfTableCell.getColor());
+        return xwpfTableCell.getColor()!= null ? WeekColor.GREEN : WeekColor.WHILE;
     }
 
     private static boolean haveText(String text) {
@@ -128,24 +134,24 @@ public class ScheduleParser {
         return true;
     }
 
-    private static ClassworkPeriod getClassworkPeriod(String text) throws ParseScheduleException {
+    private static ClassworkTime getClassworkPeriod(String text) throws ParseScheduleException {
         switch (Utils.filterString(text, numbers)) {
             case "8301000":
-                return ClassworkPeriod.FIRST_CLASSWORK;
+                return ClassworkTime.FIRST_CLASSWORK;
             case "10151145":
-                return ClassworkPeriod.SECOND_CLASSWORK;
+                return ClassworkTime.SECOND_CLASSWORK;
             case "12151345":
-                return ClassworkPeriod.THIRD_CLASSWORK;
+                return ClassworkTime.THIRD_CLASSWORK;
             case "14151545":
-                return ClassworkPeriod.FOURTH_CLASSWORK;
+                return ClassworkTime.FOURTH_CLASSWORK;
             case "16001730":
-                return ClassworkPeriod.FIFTH_CLASSWORK;
+                return ClassworkTime.FIFTH_CLASSWORK;
             case "17451915":
-                return ClassworkPeriod.SIXTH_CLASSWORK;
+                return ClassworkTime.SIXTH_CLASSWORK;
             case "19252050":
-                return ClassworkPeriod.SEVENTH_CLASSWORK;
+                return ClassworkTime.SEVENTH_CLASSWORK;
             default:
-                throw new ParseScheduleException("ClassworkPeriod not parsable");
+                throw new ParseScheduleException("ClassworkTime not parsable");
         }
 
     }

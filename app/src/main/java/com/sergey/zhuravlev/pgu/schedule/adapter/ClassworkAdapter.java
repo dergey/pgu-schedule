@@ -1,6 +1,7 @@
 package com.sergey.zhuravlev.pgu.schedule.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.sergey.zhuravlev.pgu.schedule.R;
 import com.sergey.zhuravlev.pgu.schedule.model.Classwork;
+import com.sergey.zhuravlev.pgu.schedule.model.WeekColor;
 
 import java.util.List;
 
@@ -17,10 +19,11 @@ public class ClassworkAdapter extends RecyclerView.Adapter<ClassworkAdapter.Clas
     static class ClassworkHolderView extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView title, time, dayOfWeek, teacher, audience;
+        private Context context;
 
         ClassworkHolderView(View itemView) {
             super(itemView);
-            itemView.getContext();
+            context = itemView.getContext();
             itemView.setOnClickListener(this);
             title = itemView.findViewById(R.id.classwork_item_title);
             dayOfWeek = itemView.findViewById(R.id.classwork_item_day_of_week);
@@ -33,8 +36,9 @@ public class ClassworkAdapter extends RecyclerView.Adapter<ClassworkAdapter.Clas
             title.setText(classwork.getClasswork());
             teacher.setVisibility(classwork.getTeacher() == null ? View.GONE : View.VISIBLE);
             teacher.setText(classwork.getTeacher());
-            dayOfWeek.setText(classwork.getDayOfWeek().getTitle() + (classwork.getWeekPeriod() != null ? " (" + classwork.getWeekPeriod() + "н.)" : ""));
-            time.setText(classwork.getPeriod().getPeriod());
+            dayOfWeek.setTextColor(ContextCompat.getColor(context, classwork.getWeekColor().equals(WeekColor.GREEN) ? R.color.textColorGreenWeek : R.color.textColorWhiteWeek));
+            dayOfWeek.setText(classwork.getDayOfWeek().getString() + (classwork.getWeekPeriod() != null ? " (" + classwork.getWeekPeriod() + "н.)" : ""));
+            time.setText(classwork.getTime().getString());
             audience.setText(classwork.getAudience());
         }
 

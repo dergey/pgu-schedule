@@ -9,13 +9,13 @@ public enum DayOfWeek {
     FRIDAY("Пятница"),
     SATURDAY("Суббота");
 
-    private String title;
+    private String string;
 
-    DayOfWeek(final String title) {
-        this.title = title;
+    DayOfWeek(final String string) {
+        this.string = string;
     }
 
-    public String getTitle() {
-        return title;
+    public String getString() {
+        return string;
     }
 }
