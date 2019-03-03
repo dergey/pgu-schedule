@@ -29,6 +29,26 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <FrameLayout
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:background="@android:color/transparent"
+        android:layout_height="3dp">
+
+        <ProgressBar
+            android:id="@+id/app_bar_progress_bar"
+            android:visibility="gone"
+            android:indeterminateTint="@color/progress_tint"
+            android:indeterminateTintMode="src_in"
+            android:indeterminate="true"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="-3dp"/>
+
+    </FrameLayout>
+
     <include layout="@layout/content_main" />
 
 </android.support.design.widget.CoordinatorLayout>

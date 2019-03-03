@@ -3,6 +3,7 @@ package com.sergey.zhuravlev.pgu.schedule;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -14,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.sergey.zhuravlev.pgu.schedule.adapter.ScheduleAdapter;
@@ -22,7 +25,9 @@ import com.sergey.zhuravlev.pgu.schedule.model.Schedule;
 import com.sergey.zhuravlev.pgu.schedule.parser.ScheduleParser;
 import com.sergey.zhuravlev.pgu.schedule.preprocessor.WordLoader;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +35,44 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int DOC_SELECT_CODE = 1;
 
+    private ProgressBar progressBar;
     private ScheduleAdapter adapter;
+
+    private class ScheduleParseTask extends AsyncTask<InputStream, Void, Schedule> {
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        protected Schedule doInBackground(InputStream... inputStreams) {
+            try {
+                WordLoader loader = new WordLoader();
+                return ScheduleParser.parse(loader.loadDocument(inputStreams[0]));
+            } catch (ParseScheduleException e) {
+                Toast.makeText(MainActivity.this, "ERROR WHEN PARSE " + e.getMessage(), Toast.LENGTH_LONG).show();
+                return null;
+            } catch (IOException e) {
+                Toast.makeText(MainActivity.this, "ERROR WHEN OPEN " + e.getMessage(), Toast.LENGTH_LONG).show();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            progressBar.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected void onPostExecute(Schedule schedule) {
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(MainActivity.this, "OK", Toast.LENGTH_LONG).show();
+            adapter.setSchedule(schedule);
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        progressBar = findViewById(R.id.app_bar_progress_bar);
     }
 
     @Override
@@ -61,23 +105,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == DOC_SELECT_CODE && resultCode == RESULT_OK) {
+            setProgressBarIndeterminateVisibility(true);
+            ContentResolver resolver = this.getContentResolver();
+            Uri selectedFile = data.getData();
+            if (selectedFile == null) throw new NullPointerException();
             try {
-                ContentResolver resolver = this.getContentResolver();
-                Uri selectedFile = data.getData();
-                if (selectedFile == null) throw new NullPointerException();
-                WordLoader loader = new WordLoader();
-                Schedule schedule = ScheduleParser.parse(loader.loadDocument(resolver.openInputStream(selectedFile)));
-                adapter.setSchedule(schedule);
-                Toast.makeText(this, "OK", Toast.LENGTH_LONG).show();
-            } catch (IOException e) {
-                Toast.makeText(this, "ERROR WHEN OPEN " + e.getMessage(), Toast.LENGTH_LONG).show();
-            } catch (ParseScheduleException e) {
-                Toast.makeText(this, "ERROR WHEN PARSE " + e.getMessage(), Toast.LENGTH_LONG).show();
+                ScheduleParseTask scheduleParseTask = new ScheduleParseTask();
+                scheduleParseTask.execute(resolver.openInputStream(selectedFile));
+            } catch (FileNotFoundException e) {
+                Toast.makeText(MainActivity.this, "ERROR WHEN OPEN " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }

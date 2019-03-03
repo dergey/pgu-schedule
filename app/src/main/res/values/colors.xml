@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#8c6d62</color>
+    <color name="progress_tint">#878787</color>
     <color name="textColorWhiteWeek">#FFFFFF</color>
     <color name="textColorGreenWeek">#8BC34A</color>
     <color name="colorPrimaryDark">#5e4238</color>
