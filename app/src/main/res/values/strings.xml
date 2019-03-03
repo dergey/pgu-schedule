@@ -1,10 +1,12 @@
 <resources>
-    <string name="app_name">TestEgorka</string>
+    <string name="app_name">PSU Schedule</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="action_open">Open schedule</string>
+    <string name="schedule_on_day">Schedule on day</string>
+    <string name="general_schedule">General schedule</string>
+    <string name="settings">Settings</string>
+    <string name="developers">Developers</string>
+    <string name="about">About</string>
 </resources>
