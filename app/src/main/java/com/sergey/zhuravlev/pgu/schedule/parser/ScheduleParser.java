@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 public class ScheduleParser {
 
-    private static final Pattern classwork = Pattern.compile("^([0-9]+-[0-9]+н\\.?\\s)?(.*)\\s([А-Яа-я]+\\s[А-Я]\\.[А-Я]\\.).?ауд\\.?([0-9]{3}н?)");
+    private static final Pattern classwork = Pattern.compile("(?:([0-9]+-[0-9]+н\\.?)\\s+)?(.*?)((?:[А-Я][а-я]+\\s[А-Я]\\.[А-Я]\\.,?\\s?)+)\\s?(?:ауд\\.?([0-9]{1,3}н?))?");
 
     private static final String russianAlphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
     private static final String numbers = "1234567890";
@@ -71,8 +71,10 @@ public class ScheduleParser {
                     if (column >= groups.size()) column = groups.size() - 1;
                     if (matcher.find()) {
                         rawSchedule.add(new Classwork(getWeekPeriod(matcher), getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+                        while (matcher.find())
+                            rawSchedule.add(new Classwork(getWeekPeriod(matcher), getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
                     } else {
-                        rawSchedule.add(new Classwork(null, WeekColor.WHILE, dayOfWeek, classworkTime, groups.get(column), xwpfTableCell.getText(), null, null));
+                        rawSchedule.add(new Classwork(null, getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), xwpfTableCell.getText(), null, null));
                     }
                     column++;
                 }
