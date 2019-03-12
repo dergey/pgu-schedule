@@ -9,7 +9,7 @@ public class Classwork {
     private final Group group;
     private final String classwork;
     private final String teacher;
-    private final String audience;
+    private String audience;
 
     public Classwork(WeekPeriod weekPeriod, WeekColor weekColor, DayOfWeek dayOfWeek, ClassworkTime time, Group group, String classwork, String teacher, String audience) {
         this.weekPeriod = weekPeriod;
@@ -54,4 +54,7 @@ public class Classwork {
         return audience;
     }
 
+    public void setAudience(String audience) {
+        this.audience = audience;
+    }
 }

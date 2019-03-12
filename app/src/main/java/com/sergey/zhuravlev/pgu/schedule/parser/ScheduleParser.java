@@ -19,6 +19,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,16 +67,8 @@ public class ScheduleParser {
                     classworkTime = getClassworkPeriod(xwpfTableCell.getText());
                     Log.d("Parser", "\tPERIOD " + classworkTime);
                 } else if (dayOfWeek != null && classworkTime != null && haveText(xwpfTableCell.getText())) {
-                    Matcher matcher = classwork.matcher(xwpfTableCell.getText());
-                    Log.d("Parser", "\tCLASSWORK " + xwpfTableCell.getText());
                     if (column >= groups.size()) column = groups.size() - 1;
-                    if (matcher.find()) {
-                        rawSchedule.add(new Classwork(getWeekPeriod(matcher), getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
-                        while (matcher.find())
-                            rawSchedule.add(new Classwork(getWeekPeriod(matcher), getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
-                    } else {
-                        rawSchedule.add(new Classwork(null, getWeekColor(xwpfTableCell), dayOfWeek, classworkTime, groups.get(column), xwpfTableCell.getText(), null, null));
-                    }
+                    rawSchedule.addAll(getClasswork(xwpfTableCell.getText(), dayOfWeek, classworkTime, getWeekColor(xwpfTableCell), groups.get(column)));
                     column++;
                 }
             }
@@ -97,6 +90,28 @@ public class ScheduleParser {
                 haveText = true;
         }
         return haveText;
+    }
+
+    public static Collection<Classwork> getClasswork(String text, DayOfWeek dayOfWeek, ClassworkTime classworkTime, WeekColor weekColor, Group group) {
+        List<Classwork> classworks = new ArrayList<>();
+        Matcher matcher = classwork.matcher(text);
+        Log.d("Parser", "\tCLASSWORK " + text);
+        if (matcher.find()) {
+            classworks.add(new Classwork(getWeekPeriod(matcher), weekColor, dayOfWeek, classworkTime, group, getClassworkTitle(matcher), getTeacher(matcher), getAudience(matcher)));
+            while (matcher.find()) {
+                String audience = getAudience(matcher);
+                classworks.add(new Classwork(getWeekPeriod(matcher), weekColor, dayOfWeek, classworkTime, group, getClassworkTitle(matcher), getTeacher(matcher), audience));
+                if (audience != null && !audience.isEmpty() && classworks.size() > 0) {
+                    for (int i = classworks.size() - 1; i >= 0; i--) {
+                        if (classworks.get(i).getAudience() != null && classworks.get(i).getAudience().isEmpty()) break;
+                        classworks.get(i).setAudience(audience);
+                    }
+                }
+            }
+        } else {
+            classworks.add(new Classwork(null, weekColor, dayOfWeek, classworkTime, group, text, null, null));
+        }
+        return classworks;
     }
 
     private static boolean isDayOfWeek(String text) {
